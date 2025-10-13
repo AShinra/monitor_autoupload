@@ -88,7 +88,7 @@ if __name__ == '__main__':
         old_date = doc['updated_pre']
         diff = new_value-old_value
 
-        new_data = f'{old_value} ({old_date}) ==>> {new_value} ({diff})'
+        new_data = f'{new_date} - {old_value} ({old_date}) ==>> {new_value} ({diff})'
         print(new_data)
         # st.write(f"{new_date} ==>> {count} Articles")
         # print(f"{new_date} ==>> {count} Articles")
