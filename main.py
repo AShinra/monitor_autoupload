@@ -9,10 +9,16 @@ def connect_to_mongo():
     collection = db["articles_app_article"]
     return collection
 
-def write_to_file(file_name, new_data):
+def write_to_file(new_data):
+    file_name = f'timelogs.txt'
     with open(file_name, "a") as file:
         file.write(f'{new_data}\n')
 
+def connect_to_data():
+    client = MongoClient('mongodb+srv://jonpuray:vYk9PVyQ7mQCn0Rj@cluster1.v4m9pq1.mongodb.net/?retryWrites=true&w=majority&appName=Cluster1')
+    db = client['autoupload']
+    collection = db['data']
+    return collection
 
 if __name__ == '__main__':
 
@@ -24,8 +30,8 @@ if __name__ == '__main__':
 
     print(f'Generated as of {datetime.now().strftime("%Y-%m-%d %I:%M:%S %p")}')
 
-    file_name = f'timelogs.txt'
-    write_to_file(file_name, f'\nGenerated as of {datetime.now().strftime("%Y-%m-%d %I:%M:%S %p")}')
+    write_to_file(f'\nOnline Automated PickUps Tracking')
+    write_to_file(f'Generated as of {datetime.now().strftime("%Y-%m-%d %I:%M:%S %p")}')
 
     # generate dates from the range i
     for i in range (0, 6):
@@ -46,7 +52,45 @@ if __name__ == '__main__':
         # Count documents matching the query
         count = collection.count_documents(query)
         
+
+        data_collection = connect_to_data()
+
+        doc = data_collection.find_one(
+            {'date':str(new_date)}
+        )
+
+        if doc:
+            # get the last value and assign to old
+            old_value = doc['value']['new']
+            date_pre = doc['updated_at']
+
+            # update the document
+            data_collection.update_one(
+                {'date':str(new_date)},
+                {'$set':{
+                    'value.old':old_value,
+                    'value.new':count,
+                    'updated_pre':date_pre,
+                    'updated_at':f'{datetime.now().strftime("%Y-%m-%d %I:%M:%S %p")}'
+                }})
+        else:
+            data = {
+                'date':str(new_date),
+                'value':{'old':0,'new':count},
+                'updated_pre':'',
+                'updated_at':f'{datetime.now().strftime("%Y-%m-%d %I:%M:%S %p")}'
+            }
+
+            data_collection.insert_one(data)
+        
+        old_value = doc['value']['old']
+        new_value = doc['value']['new']
+        old_date = doc['updated_pre']
+        diff = new_value-old_value
+
+        new_data = f'{old_value} ({old_date}) ==>> {new_value} ({diff})'
+        print(new_data)
         # st.write(f"{new_date} ==>> {count} Articles")
-        print(f"{new_date} ==>> {count} Articles")
-        new_data = f"{new_date} ==>> {count} Articles"
-        write_to_file(file_name, new_data)
+        # print(f"{new_date} ==>> {count} Articles")
+        # new_data = f"{new_date} ==>> {count} Articles"
+        write_to_file(new_data)
