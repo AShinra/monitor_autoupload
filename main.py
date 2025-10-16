@@ -62,7 +62,7 @@ if __name__ == '__main__':
         if doc:
             # get the last value and assign to old
             old_value = doc['value']['new']
-            date_pre = doc['updated_at']
+            old_date = doc['updated_at']
 
             # update the document
             data_collection.update_one(
@@ -70,25 +70,24 @@ if __name__ == '__main__':
                 {'$set':{
                     'value.old':old_value,
                     'value.new':count,
-                    'updated_pre':date_pre,
+                    'updated_pre':old_date,
                     'updated_at':f'{datetime.now().strftime("%Y-%m-%d %I:%M:%S %p")}'
                 }})
         else:
+            old_value = 0
+            old_date = ''
             data = {
                 'date':str(new_date),
-                'value':{'old':0,'new':count},
-                'updated_pre':'',
+                'value':{'old':old_value,'new':count},
+                'updated_pre':old_date,
                 'updated_at':f'{datetime.now().strftime("%Y-%m-%d %I:%M:%S %p")}'
             }
 
             data_collection.insert_one(data)
         
-        old_value = doc['value']['old']
-        new_value = doc['value']['new']
-        old_date = doc['updated_pre']
-        diff = new_value-old_value
+        diff = count-old_value
 
-        new_data = f'{new_date} - {old_value} ({old_date}) ==>> {new_value} ({diff})'
+        new_data = f'{new_date} - {old_value} ({old_date}) ==>> {count} ({diff})'
         print(new_data)
         # st.write(f"{new_date} ==>> {count} Articles")
         # print(f"{new_date} ==>> {count} Articles")
