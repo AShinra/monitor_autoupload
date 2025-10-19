@@ -33,6 +33,12 @@ if __name__ == '__main__':
     write_to_file(f'\nOnline Automated PickUps Tracking')
     write_to_file(f'Generated as of {datetime.now().strftime("%Y-%m-%d %I:%M:%S %p")}')
 
+    data_collection = connect_to_data()
+    last_doc = data_collection.find_one(sort=[("_id", -1)])
+    header_date = last_doc["updated_pre"]
+
+    write_to_file(header_date)
+    print(header_date)
     # generate dates from the range i
     for i in range (0, 6):
         new_date = _date - timedelta(days=i)
@@ -87,7 +93,7 @@ if __name__ == '__main__':
         
         diff = count-old_value
 
-        new_data = f'{new_date} - {old_value} ({old_date}) ==>> {count} ({diff})'
+        new_data = f'{new_date} - {old_value} ==>> {count} ({diff})'
         print(new_data)
         # st.write(f"{new_date} ==>> {count} Articles")
         # print(f"{new_date} ==>> {count} Articles")
