@@ -35,7 +35,7 @@ if __name__ == '__main__':
 
     data_collection = connect_to_data()
     last_doc = data_collection.find_one(sort=[("_id", -1)])
-    header_date = last_doc["updated_pre"]
+    header_date = last_doc["updated_at"]
 
     write_to_file(header_date)
     print(header_date)
