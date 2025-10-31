@@ -30,8 +30,8 @@ if __name__ == '__main__':
 
     print(f'Generated as of {datetime.now().strftime("%Y-%m-%d %I:%M:%S %p")}')
 
-    write_to_file(f'\nOnline Automated PickUps Tracking')
-    write_to_file(f'Generated as of {datetime.now().strftime("%Y-%m-%d %I:%M:%S %p")}')
+    write_to_file(f'\n*Online Automated PickUps Tracking*')
+    write_to_file(f'Generated as of {datetime.now().strftime("%Y-%m-%d %I:%M:%S %p")}\n')
 
     data_collection = connect_to_data()
     last_doc = data_collection.find_one(sort=[("_id", -1)])
@@ -46,12 +46,18 @@ if __name__ == '__main__':
         _day= new_date.day
         _year = new_date.year
 
+        # yesterday
+        yes_date = _date - timedelta(days=i+1)
+        yes_month = yes_date.month
+        yes_day = yes_date.day
+        yes_year = yes_date.year
+
         # generate query
         query = {
         "created_by_id": ObjectId("619f0998a834a290ce4ef787"),
         "media_source.media_source_type_flag": "web",
         "date_publish": {
-            "$gte": datetime(_year, _month, _day-1, 16, 0, 0),
+            "$gte": datetime(yes_year, yes_month, yes_day, 16, 0, 0),
             "$lt": datetime(_year, _month, _day, 16, 0, 0)
         }}
 
