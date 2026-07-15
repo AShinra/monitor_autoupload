@@ -2,6 +2,7 @@ from datetime import date, datetime, timedelta
 from pymongo import MongoClient
 from bson.objectid import ObjectId
 from common import connect_to_data, connect_to_mongo, write_to_file
+from mailer import send_email
 
 if __name__ == '__main__':
 
@@ -24,6 +25,7 @@ if __name__ == '__main__':
     write_to_file(f'LAST UPDATE: {header_date}')
     print(f'LAST UPDATE: {header_date}')
     # generate dates from the range i
+    _text = ''
     for i in range (0, 6):
         new_date = _date - timedelta(days=i)
         _month= new_date.month
@@ -89,3 +91,7 @@ if __name__ == '__main__':
         # print(f"{new_date} ==>> {count} Articles")
         # new_data = f"{new_date} ==>> {count} Articles"
         write_to_file(f'@ {new_data}')
+
+        _text += new_data
+
+    send_email('jonpuray@gmail.com', 'Upload Monitor Update', _text)
