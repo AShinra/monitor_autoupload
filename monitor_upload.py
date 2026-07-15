@@ -1,44 +1,28 @@
 from datetime import date, datetime, timedelta
 from pymongo import MongoClient
 from bson.objectid import ObjectId
-
-
-def connect_to_mongo():
-    client = MongoClient('mongodb://admin:q8vm5dz-h29piX%3FMo%26%3ClO4e0zn@mongodb4:27017,arbiter:27017/zeno_db?authSource=admin&replicaSet=rs1')
-    db = client["zeno_db"]
-    collection = db["articles_app_article"]
-    return collection
-
-def write_to_file(new_data):
-    file_name = f'timelogs.txt'
-    with open(file_name, "a") as file:
-        file.write(f'{new_data}\n')
-
-def connect_to_data():
-    client = MongoClient('mongodb+srv://jonpuray:vYk9PVyQ7mQCn0Rj@cluster1.v4m9pq1.mongodb.net/?retryWrites=true&w=majority&appName=Cluster1')
-    db = client['autoupload']
-    collection = db['data']
-    return collection
+from common import connect_to_data, connect_to_mongo, write_to_file
 
 if __name__ == '__main__':
 
     # get collection from mongodb
-    collection = connect_to_mongo()
+    db = connect_to_mongo()
+    collection = db["articles_app_article"]    
 
     # get date today
     _date = date.today()
+    print(f'GENERATED: {datetime.now().strftime("%Y-%m-%d %I:%M:%S %p")}')
 
-    print(f'Generated as of {datetime.now().strftime("%Y-%m-%d %I:%M:%S %p")}')
-
-    write_to_file(f'\n*Online Automated PickUps Tracking*')
-    write_to_file(f'Generated as of {datetime.now().strftime("%Y-%m-%d %I:%M:%S %p")}\n')
+    write_to_file(f'\n*ONLINE AUTOMATED PICKUPS TRACKING*')
+    write_to_file(f'GENERATED: {datetime.now().strftime("%Y-%m-%d %I:%M:%S %p")}')
+    write_to_file(f'\n*DAILY SUMMARY*')
 
     data_collection = connect_to_data()
     last_doc = data_collection.find_one(sort=[("_id", -1)])
     header_date = last_doc["updated_at"]
 
-    write_to_file(header_date)
-    print(header_date)
+    write_to_file(f'LAST UPDATE: {header_date}')
+    print(f'LAST UPDATE: {header_date}')
     # generate dates from the range i
     for i in range (0, 6):
         new_date = _date - timedelta(days=i)
@@ -100,8 +84,8 @@ if __name__ == '__main__':
         diff = count-old_value
 
         new_data = f'{new_date} - {old_value} ==>> {count} ({diff})'
-        print(new_data)
+        print(f'@ {new_data}')
         # st.write(f"{new_date} ==>> {count} Articles")
         # print(f"{new_date} ==>> {count} Articles")
         # new_data = f"{new_date} ==>> {count} Articles"
-        write_to_file(new_data)
+        write_to_file(f'@ {new_data}')
